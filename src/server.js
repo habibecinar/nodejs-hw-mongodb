@@ -2,12 +2,15 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
+import { getAllContactsController } from "./controllers/contactsController.js";
 
 export function setupServer() {
   const app = express();
 
   // JSON body parsing
   app.use(express.json());
+// Route
+app.get("/contacts", getAllContactsController);
 
   // Enable CORS
   app.use(cors());
