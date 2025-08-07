@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import { Contact } from '../models/Contact.js';
 
 dotenv.config();
+console.log('Çalışma dizini:', process.cwd());
+
 
 const seedContacts = async () => {
   try {
@@ -21,7 +23,8 @@ const seedContacts = async () => {
     console.log('MongoDB connected for seeding...');
 
     // contacts.json dosyasını oku
-    const dataPath = path.resolve('contacts.json');
+    const dataPath = path.resolve(process.cwd(), 'contacts.json');
+
     const data = await fs.readFile(dataPath, 'utf-8');
     const contacts = JSON.parse(data);
 
