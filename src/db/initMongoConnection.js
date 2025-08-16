@@ -1,13 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config(); // en üstte
 
 export const initMongoConnection = async () => {
-  const MONGODB_URI = process.env.MONGODB_URI;
-
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log('Mongo connection successfully established!');
+    const uri = `mongodb+srv://${encodeURIComponent(process.env.MONGODB_USER)}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${process.env.MONGODB_URL}/${process.env.MONGODB_DB}?retryWrites=true&w=majority`;
+
+    await mongoose.connect(uri);
+    console.log("MongoDB connected!");
   } catch (error) {
-    console.error('Mongo connection failed:', error.message);
+    console.error("Mongo connection failed:", error);
     process.exit(1);
   }
 };
