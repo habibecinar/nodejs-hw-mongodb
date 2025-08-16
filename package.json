@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "seed": "node src/scripts/seedContacts.js",
-    "start": "node index.js"
+    "start": "node src/index.js"
 
   },
   "dependencies": {
