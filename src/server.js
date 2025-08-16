@@ -5,6 +5,8 @@ import contactsRouter from './routers/contacts.js';
 import { errorHandler } from './middlewares/errorHandler.js';  
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
+import "./index.js";
+
 export function setupServer() {
   const app = express();
 
