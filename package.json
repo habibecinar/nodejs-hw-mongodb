@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "type": "module",
-    "seed": "node src/scripts/seedContacts.js"
+    "seed": "node src/scripts/seedContacts.js",
+    "start": "node src/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
