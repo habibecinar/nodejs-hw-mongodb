@@ -33,7 +33,5 @@ export function setupServer() {
     res.send({ message: 'Server is running!' });
   });
 
-
- 
   return app;
 }
