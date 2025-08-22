@@ -26,8 +26,8 @@ export const getAllContactsController = async (req, res, next) => {
     }
 
     const result = await getAllContactsService({
-      page,
-      perPage,
+      page: Number(page),
+      perPage: Number(perPage),
       sortBy,
       sortOrder,
       filter,

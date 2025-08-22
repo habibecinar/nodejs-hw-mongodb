@@ -1,18 +1,23 @@
-import mongoose from "mongoose";;
+// src/db/models/contact.js
+import mongoose from "mongoose";
 
 const contactSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, "Name is required"],
+      minlength: 3,
+      maxlength: 20,
     },
     email: {
       type: String,
-      required: false,
+      required: [true, "Email is required"],
     },
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required"],
+      minlength: 3,
+      maxlength: 20,
     },
     isFavourite: {
       type: Boolean,
@@ -20,12 +25,14 @@ const contactSchema = new mongoose.Schema(
     },
     contactType: {
       type: String,
-      enum: ['work', 'home', 'personal'],
-      default: 'personal',
+      enum: ["work", "home", "personal"],
+      default: "personal",
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
+
 const Contact = mongoose.model("Contact", contactSchema);
+
 export default Contact;
