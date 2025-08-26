@@ -4,7 +4,7 @@ import pino from 'pino-http';
 import contactsRouter from './routers/contacts.js';
 import { errorHandler } from './middlewares/errorHandler.js';  
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
-
+import authRouter from "./routers/auth.js";
 import "./index.js";
 
 export function setupServer() {
@@ -19,6 +19,7 @@ export function setupServer() {
   // JSON body parsing
   app.use(express.json());
 
+  app.use("/auth", authRouter);
   // Routes
   app.use('/contacts', contactsRouter);
 
@@ -32,6 +33,8 @@ export function setupServer() {
   app.get('/', (req, res) => {
     res.send({ message: 'Server is running!' });
   });
-
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
   return app;
 }
