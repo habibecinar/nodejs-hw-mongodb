@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
-import { UsersCollection } from "../db/models/user.js";
+import { UsersCollection } from "../models/user.js";
 
 export const registerUser = async (payload) => {
   const { name, email, password } = payload;
