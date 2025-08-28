@@ -9,7 +9,11 @@ import "./index.js";
 import cookieParser from "cookie-parser";
 export function setupServer() {
   const app = express();
-
+  
+ // Örnek rota
+  app.get('/', (req, res) => {
+    res.send({ message: 'Server is running!' });
+  });
   // Enable CORS
   app.use(cors());
 
@@ -29,10 +33,7 @@ app.use(cookieParser()); // cookie kullanabilmek için
  // Hata yakalama middleware'i
   app.use(errorHandler);
 
-  // Örnek rota
-  app.get('/', (req, res) => {
-    res.send({ message: 'Server is running!' });
-  });
+ 
 
   return app;
 }
