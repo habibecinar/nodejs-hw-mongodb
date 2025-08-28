@@ -10,6 +10,8 @@ import {
 // GET /contacts  (pagination + sort + filter)
 export const getAllContactsController = async (req, res, next) => {
   try {
+    const userId = req.user.id; // authenticate middleware ile geldi
+
     const {
       page = 1,
       perPage = 10,
@@ -19,7 +21,7 @@ export const getAllContactsController = async (req, res, next) => {
       isFavourite,
     } = req.query;
 
-    const filter = {};
+    const filter = { userId }; // userId filtreye ekleniyor
     if (type) filter.contactType = type;
     if (typeof isFavourite !== "undefined") {
       filter.isFavourite = String(isFavourite).toLowerCase() === "true";
@@ -47,7 +49,8 @@ export const getAllContactsController = async (req, res, next) => {
 export const getContactByIdController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const contact = await getContactByIdService(contactId);
+    const userId = req.user.id; // sadece kendi kontaklarını al
+    const contact = await getContactByIdService(contactId, userId);
     if (!contact) {
       return next(createError(404, "Contact not found"));
     }
@@ -64,7 +67,9 @@ export const getContactByIdController = async (req, res, next) => {
 // POST /contacts
 export const createContactController = async (req, res, next) => {
   try {
-    const newContact = await createContactService(req.body);
+    const userId = req.user.id; 
+    const contactData = { ...req.body, userId }; 
+    const newContact = await createContactService(contactData);
     res.status(201).json({
       status: 201,
       message: "Successfully created a contact!",
@@ -79,7 +84,8 @@ export const createContactController = async (req, res, next) => {
 export const updateContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const updatedContact = await updateContactService(contactId, req.body);
+    const userId = req.user.id; // sadece kendi kontaklarını güncelle
+    const updatedContact = await updateContactService(contactId, req.body, userId);
 
     if (!updatedContact) {
       return next(createError(404, "Contact not found"));
@@ -99,7 +105,8 @@ export const updateContactController = async (req, res, next) => {
 export const deleteContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const deletedContact = await deleteContactService(contactId);
+    const userId = req.user.id; // sadece kendi kontaklarını silebilir
+    const deletedContact = await deleteContactService(contactId, userId);
 
     if (!deletedContact) {
       return next(createError(404, "Contact not found"));
