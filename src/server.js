@@ -6,7 +6,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import authRouter from "./routers/auth.js";
 import "./index.js";
-
+import cookieParser from "cookie-parser";
 export function setupServer() {
   const app = express();
 
@@ -18,7 +18,7 @@ export function setupServer() {
 
   // JSON body parsing
   app.use(express.json());
-
+app.use(cookieParser()); // cookie kullanabilmek için
   app.use("/auth", authRouter);
   // Routes
   app.use('/contacts', contactsRouter);
