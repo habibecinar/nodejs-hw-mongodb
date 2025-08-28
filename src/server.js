@@ -33,8 +33,6 @@ app.use(cookieParser()); // cookie kullanabilmek için
   app.get('/', (req, res) => {
     res.send({ message: 'Server is running!' });
   });
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
+
   return app;
 }

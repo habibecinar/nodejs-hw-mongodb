@@ -1,5 +1,6 @@
 import { registerUser,loginUser} from "../services/auth.js";
 import { refreshSession } from "../services/auth.js";
+import { logoutUser } from "../services/auth.js";
 export const registerUserController = async (req, res, next) => {
   try {
     // Kullanıcıyı servis katmanında oluştur
@@ -69,3 +70,19 @@ export const refreshSessionController = async (req, res, next) => {
   }
 };
 
+
+export const logoutUserController = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    await logoutUser(refreshToken);
+
+    // Cookie temizle
+    res.clearCookie("refreshToken");
+
+    // 204 döndür (no content)
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};

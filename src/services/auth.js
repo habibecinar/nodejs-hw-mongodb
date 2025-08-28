@@ -96,3 +96,11 @@ export const refreshSession = async (refreshToken) => {
 
   return newSession;
 };
+export const logoutUser = async (refreshToken) => {
+  if (!refreshToken) {
+    throw createHttpError(401, "Refresh token missing");
+  }
+
+  // Token’a bağlı session varsa sil
+  await SessionsCollection.deleteOne({ refreshToken });
+};
