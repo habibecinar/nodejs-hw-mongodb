@@ -1,4 +1,5 @@
 import createError from "http-errors";
+import Contact from "../db/models/contact.js"; // insertMany kullanabilmek için
 import {
   getAllContactsService,
   getContactByIdService,
@@ -68,12 +69,26 @@ export const getContactByIdController = async (req, res, next) => {
 export const createContactController = async (req, res, next) => {
   try {
     const userId = req.user.id; 
-    const contactData = { ...req.body, userId }; 
-    const newContact = await createContactService(contactData);
+
+    let newContacts;
+
+    if (Array.isArray(req.body)) {
+      // Eğer body bir array ise → topluca ekle
+      const contactsData = req.body.map(contact => ({
+        ...contact,
+        userId,
+      }));
+      newContacts = await Contact.insertMany(contactsData);
+    } else {
+      // Tek contact ise → normal servis üzerinden ekle
+      const contactData = { ...req.body, userId };
+      newContacts = await createContactService(contactData);
+    }
+
     res.status(201).json({
       status: 201,
-      message: "Successfully created a contact!",
-      data: newContact,
+      message: "Successfully created contact(s)!",
+      data: newContacts,
     });
   } catch (error) {
     next(error);
