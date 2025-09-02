@@ -1,6 +1,9 @@
 import { registerUser,loginUser} from "../services/auth.js";
 import { refreshSession } from "../services/auth.js";
 import { logoutUser } from "../services/auth.js";
+import { sendEmail } from "../services/emailService.js";
+import createHttpError from "http-errors";
+import jwt from "jsonwebtoken";
 export const registerUserController = async (req, res, next) => {
   try {
     // Kullanıcıyı servis katmanında oluştur
@@ -83,6 +86,50 @@ export const logoutUserController = async (req, res, next) => {
     // 204 döndür (no content)
     res.status(204).send();
   } catch (error) {
+    next(error);
+  }
+};
+
+export const sendResetEmailController = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // 1. Body doğrulama
+    if (!email) {
+      throw createHttpError(400, "Email is required!");
+    }
+
+    // 2. Kullanıcıyı bul
+    const user = await user.findOne({ email });
+    if (!user) {
+      throw createHttpError(404, "User not found!");
+    }
+
+    // 3. Token üret (5 dakika geçerli)
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+      expiresIn: "5m",
+    });
+
+    // 4. Link oluştur
+    const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
+
+    // 5. Mail gönder
+    await sendEmail(
+      email,
+      "Şifre Sıfırlama",
+      `<p>Şifre sıfırlamak için <a href="${resetLink}">buraya tıkla</a>. Link 5 dakika geçerlidir.</p>`
+    );
+
+    // 6. Response döndür
+    res.status(200).json({
+      status: 200,
+      message: "Reset password email has been successfully sent.",
+      data: {},
+    });
+  } catch (error) {
+    if (error.message.includes("Failed to send the email")) {
+      return next(createHttpError(500, "Failed to send the email, please try again later."));
+    }
     next(error);
   }
 };
