@@ -1,4 +1,4 @@
-import Contact from "../models/Contact.js";
+import Contact from "../models/contact.js";
 
 // Tüm contactları (sayfalama + sıralama + filtreleme) getir
 export const getAllContactsService = async ({

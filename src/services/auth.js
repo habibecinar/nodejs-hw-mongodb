@@ -1,10 +1,8 @@
+import  UsersCollection  from "../models/User.js";
+import { SessionsCollection } from "../models/session.js";
 import { randomBytes } from "crypto";
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
-
-import { UsersCollection } from "../models/user.js";
-import { SessionsCollection } from "../models/session.js";
-
 
 // Token süreleri
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
@@ -103,4 +101,7 @@ export const logoutUser = async (refreshToken) => {
 
   // Token’a bağlı session varsa sil
   await SessionsCollection.deleteOne({ refreshToken });
+};
+export const deleteSessionByUserId = async (userId) => {
+  return await SessionsCollection.deleteMany({ userId });
 };

@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 // Kullanıcı şeması
-const usersSchema = new Schema(
+ const usersSchema = new Schema(
   {
     name: {
       type: String,
@@ -24,4 +24,5 @@ const usersSchema = new Schema(
 );
 
 // "users" koleksiyonunu oluşturuyoruz
-export const UsersCollection = model("users", usersSchema);
+ const UsersCollection = model("users", usersSchema);
+  export default UsersCollection;

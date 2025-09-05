@@ -1,9 +1,11 @@
-import { registerUser,loginUser} from "../services/auth.js";
-import { refreshSession } from "../services/auth.js";
-import { logoutUser } from "../services/auth.js";
-import { sendEmail } from "../services/emailService.js";
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
+import UsersCollection from "../models/User.js";
+import { deleteSessionByUserId ,registerUser,loginUser,logoutUser} from "../services/auth.js";
+import { sendEmail } from "../services/emailService.js";
+import { refreshSession } from "../services/auth.js";
+import bcrypt from "bcrypt";
+
 export const registerUserController = async (req, res, next) => {
   try {
     // Kullanıcıyı servis katmanında oluştur
@@ -100,13 +102,13 @@ export const sendResetEmailController = async (req, res, next) => {
     }
 
     // 2. Kullanıcıyı bul
-    const user = await user.findOne({ email });
+    const user = await UsersCollection.findOne({ email });
     if (!user) {
       throw createHttpError(404, "User not found!");
     }
 
     // 3. Token üret (5 dakika geçerli)
-    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "5m",
     });
 
@@ -115,7 +117,7 @@ export const sendResetEmailController = async (req, res, next) => {
 
     // 5. Mail gönder
     await sendEmail(
-      email,
+      user.email,
       "Şifre Sıfırlama",
       `<p>Şifre sıfırlamak için <a href="${resetLink}">buraya tıkla</a>. Link 5 dakika geçerlidir.</p>`
     );
@@ -130,6 +132,45 @@ export const sendResetEmailController = async (req, res, next) => {
     if (error.message.includes("Failed to send the email")) {
       return next(createHttpError(500, "Failed to send the email, please try again later."));
     }
+    next(error);
+  }
+};
+//ADIM 4: Şifre sıfırlama
+export const resetPasswordController = async (req, res, next) => {
+  try {
+    // ✅ Body ve alan kontrolü burada yapılır
+    if (!req.body) throw createHttpError(400, "Body is missing!");
+    const { token, password } = req.body;
+    if (!token || !password) throw createHttpError(400, "Token and password are required");
+
+    // Token doğrulama
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return next(createHttpError(401, "Token is expired or invalid."));
+    }
+
+    // Kullanıcıyı bul
+    const user = await UsersCollection.findOne({ email: payload.email });
+    if (!user) throw createHttpError(404, "User not found!");
+
+    //  Şifreyi hashle
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Şifreyi güncelle
+    user.password = hashedPassword;
+    await user.save();
+
+    // Oturumları sil
+    await deleteSessionByUserId(user._id);
+
+    res.status(200).json({
+      status: 200,
+      message: "Password has been successfully reset.",
+      data: {},
+    });
+  } catch (error) {
     next(error);
   }
 };

@@ -20,3 +20,14 @@ export const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
 });
+
+// Şifre sıfırlama maili göndermek için
+export const sendResetSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+// Şifreyi gerçekten sıfırlamak için
+export const resetPasswordSchema = Joi.object({
+  token: Joi.string().required(),
+  password: Joi.string().min(6).max(50).required(),
+});

@@ -1,5 +1,5 @@
 import createError from "http-errors";
-import Contact from "../db/models/contact.js"; // insertMany kullanabilmek için
+import Contact from "../models/contact.js"; // insertMany kullanabilmek için
 import {
   getAllContactsService,
   getContactByIdService,

@@ -1,4 +1,4 @@
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res) => {
   console.error(err);
 
   const statusCode = err.status || 500;  // Eğer hata objesinde status yoksa 500

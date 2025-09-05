@@ -1,4 +1,4 @@
-// src/db/models/contact.js
+// src/models/contact.js
 import mongoose from "mongoose";
 
 const contactSchema = new mongoose.Schema(
@@ -39,6 +39,6 @@ const contactSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-const Contact = mongoose.model("Contact", contactSchema);
+const Contact = mongoose.models.Contact || mongoose.model("Contact", contactSchema);
 
 export default Contact;

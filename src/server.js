@@ -33,7 +33,6 @@ app.use(cookieParser()); // cookie kullanabilmek için
  // Hata yakalama middleware'i
   app.use(errorHandler);
 
- 
 
   return app;
 }
