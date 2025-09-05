@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import fs from 'fs/promises';
 import path from 'path';
 import dotenv from 'dotenv';
-import Contact  from '../models/contact.js';
+import Contact  from '../models/Contact.js';
 
 dotenv.config();
 console.log('Çalışma dizini:', process.cwd());
