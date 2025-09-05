@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
-import UsersCollection from "../models/User.js";
+import UsersCollection from "../models/user.js";
 import { deleteSessionByUserId ,registerUser,loginUser,logoutUser} from "../services/auth.js";
 import { sendEmail } from "../services/emailService.js";
 import { refreshSession } from "../services/auth.js";
