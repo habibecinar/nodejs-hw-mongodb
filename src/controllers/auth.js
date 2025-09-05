@@ -129,7 +129,8 @@ export const sendResetEmailController = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
-    if (error.message.includes("Failed to send the email")) {
+    console.log("[sendResetEmailController] Hata:", error);
+    if (error.message && error.message.includes("Failed to send the email")) {
       return next(createHttpError(500, "Failed to send the email, please try again later."));
     }
     next(error);
