@@ -1,4 +1,4 @@
-import  UsersCollection  from "../models/user.js";
+import {UsersCollection}  from "../models/user.js";
 import SessionsCollection from "../models/session.js";
 import { randomBytes } from "crypto";
 import bcrypt from "bcrypt";

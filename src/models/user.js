@@ -1,3 +1,4 @@
+import e from "express";
 import { model, Schema } from "mongoose";
 
 // Kullanıcı şeması
@@ -24,5 +25,5 @@ import { model, Schema } from "mongoose";
 );
 
 // "users" koleksiyonunu oluşturuyoruz
- const UsersCollection = model("users", usersSchema);
-  export default UsersCollection;
+  const UsersCollection = model("users", usersSchema);
+export default UsersCollection;

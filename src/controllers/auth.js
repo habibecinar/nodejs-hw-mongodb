@@ -1,9 +1,8 @@
+import UsersCollection from "../models/user.js";
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
-import UsersCollection from "../models/user.js";
-import { deleteSessionByUserId ,registerUser,loginUser,logoutUser} from "../services/auth.js";
+import { deleteSessionByUserId ,registerUser,loginUser,logoutUser,refreshSession } from "../services/auth.js";
 import { sendEmail } from "../services/emailService.js";
-import { refreshSession } from "../services/auth.js";
 import bcrypt from "bcrypt";
 
 export const registerUserController = async (req, res, next) => {
@@ -130,6 +129,7 @@ export const sendResetEmailController = async (req, res, next) => {
     });
   } catch (error) {
     console.log("[sendResetEmailController] Hata:", error);
+    console.error(error);
     if (error.message && error.message.includes("Failed to send the email")) {
       return next(createHttpError(500, "Failed to send the email, please try again later."));
     }
