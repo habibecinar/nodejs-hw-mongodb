@@ -95,75 +95,60 @@ export const sendResetEmailController = async (req, res, next) => {
   try {
     const { email } = req.body;
 
-    // 1. Body doğrulama
-    if (!email) {
-      throw createHttpError(400, "Email is required!");
-    }
-
-    // 2. Kullanıcıyı bul
     const user = await UsersCollection.findOne({ email });
     if (!user) {
-      throw createHttpError(404, "User not found!");
+      return res.status(404).json({ status: 404, message: "User not found!" });
     }
 
-    // 3. Token üret (5 dakika geçerli)
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "5m",
-    });
-
-    // 4. Link oluştur
-    const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
-
-    // 5. Mail gönder
-    await sendEmail(
-      user.email,
-      "Şifre Sıfırlama",
-      `<p>Şifre sıfırlamak için <a href="${resetLink}">buraya tıkla</a>. Link 5 dakika geçerlidir.</p>`
+    // JWT token üret
+    const token = jwt.sign(
+      { email: user.email },   // email koyuyoruz
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
-    // 6. Response döndür
-    res.status(200).json({
-      status: 200,
-      message: "Reset password email has been successfully sent.",
-      data: {},
+    const resetLink = `${process.env.APP_DOMAIN}/auth/reset-pwd?token=${token}`;
+
+    await sendEmail({
+      to: email,
+      subject: "Password Reset",
+      html: `<p>Click the link to reset your password:</p>
+             <a href="${resetLink}">${resetLink}</a>`,
     });
-  } catch (error) {
-    console.log("[sendResetEmailController] Hata:", error);
-    console.error(error);
-    if (error.message && error.message.includes("Failed to send the email")) {
-      return next(createHttpError(500, "Failed to send the email, please try again later."));
-    }
-    next(error);
+
+    res.json({
+      status: 200,
+      message: "Password reset email sent",
+    });
+  } catch (err) {
+    next(err);
   }
 };
 //ADIM 4: Şifre sıfırlama
 export const resetPasswordController = async (req, res, next) => {
   try {
-    // ✅ Body ve alan kontrolü burada yapılır
-    if (!req.body) throw createHttpError(400, "Body is missing!");
     const { token, password } = req.body;
-    if (!token || !password) throw createHttpError(400, "Token and password are required");
 
-    // Token doğrulama
-    let payload;
+    // Tokeni verify et
+    let decoded;
     try {
-      payload = jwt.verify(token, process.env.JWT_SECRET);
-    } catch {
-      return next(createHttpError(401, "Token is expired or invalid."));
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      throw createHttpError(401, "Token is expired or invalid.");
     }
 
     // Kullanıcıyı bul
-    const user = await UsersCollection.findOne({ email: payload.email });
-    if (!user) throw createHttpError(404, "User not found!");
+    const user = await UsersCollection.findOne({ email: decoded.email });
+    if (!user) {
+      throw createHttpError(404, "User not found!");
+    }
 
-    //  Şifreyi hashle
+    // Şifreyi hashle
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Şifreyi güncelle
     user.password = hashedPassword;
     await user.save();
 
-    // Oturumları sil
+    // Kullanıcının mevcut sessionlarını sil
     await deleteSessionByUserId(user._id);
 
     res.status(200).json({
@@ -171,7 +156,7 @@ export const resetPasswordController = async (req, res, next) => {
       message: "Password has been successfully reset.",
       data: {},
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
