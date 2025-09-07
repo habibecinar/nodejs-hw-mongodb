@@ -99,6 +99,7 @@ export const sendResetEmailController = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ status: 404, message: "User not found!" });
     }
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
     // JWT token üret
     const token = jwt.sign(
