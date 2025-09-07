@@ -19,7 +19,7 @@ export const sendEmail = async (to, subject, html) => {
       html,
     });
   } catch (error) {
-    console.log(error); // Hatanın nedenini görmek için log
+    console.error("[sendEmail error]", error, error?.response);
     throw new Error("Failed to send the email, please try again later.");
   }
 };
