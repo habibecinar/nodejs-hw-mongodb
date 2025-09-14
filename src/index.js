@@ -4,10 +4,14 @@ import { setupServer } from './server.js';
 import { initMongoConnection } from './db/initMongoConnection.js';
 import contactsRouter from "./routers/contacts.js";
 import errorHandler from "./middlewares/errorHandler.js";
+import { testSMTPConnection } from './services/emailService.js';
 
 
 const start = async () => {
  await initMongoConnection(); // MongoDB bağlantısı kurulmadan sunucu başlamasın
+ 
+ // SMTP bağlantısını test et
+ await testSMTPConnection();
 
 const PORT = process.env.PORT || 3000;
 const app = setupServer();

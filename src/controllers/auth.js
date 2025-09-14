@@ -117,17 +117,36 @@ export const sendResetEmailController = async (req, res, next) => {
       { expiresIn: "1h" }
     );
      const resetLink = `${process.env.APP_DOMAIN}/auth/reset-pwd?token=${token}`;
-       await sendEmail(
+    
+    console.log("Sending reset email to:", email);
+    console.log("Reset link:", resetLink);
+    
+    await sendEmail(
       email,
       "Password Reset",
-      `<p>Click the link to reset your password:</p>
-    <a href="${resetLink}">${resetLink}</a>`
+      `<html>
+        <body>
+          <h2>Password Reset Request</h2>
+          <p>You requested to reset your password. Click the link below to reset your password:</p>
+          <p><a href="${resetLink}" style="color: #007bff; text-decoration: none; font-weight: bold;">Reset Password</a></p>
+          <p>If you cannot click the link, copy and paste this URL into your browser:</p>
+          <p>${resetLink}</p>
+          <p><strong>Note:</strong> This link will expire in 1 hour.</p>
+          <p>If you did not request this password reset, please ignore this email.</p>
+        </body>
+      </html>`
     );
-    // Sadece token'ı response olarak döndür
+    
+    console.log("Reset email sent successfully to:", email);
+    
     return res.json({
       status: 200,
-      message: "Token for test",
-      token
+      message: "Reset email sent successfully. Please check your email.",
+      data: {
+        email: email,
+        // Test amaçlı token da dahil edelim
+        token_for_testing: token
+      }
     });
   } catch (err) {
     console.error("sendResetEmailController error:", err, "email:", req.body.email, "JWT_SECRET:", process.env.JWT_SECRET);
