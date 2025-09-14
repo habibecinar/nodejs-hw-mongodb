@@ -12,11 +12,11 @@ export const initMongoConnection = async () => {
     console.log("MONGODB_DB:", process.env.MONGODB_DB);
 
   const uri = `mongodb+srv://${encodeURIComponent(
-      process.env.MONGO_USER
-    )}:${encodeURIComponent(process.env.MONGO_PASSWORD)}@${
-      process.env.MONGO_URL
-    }/${process.env.MONGO_DB}`;
-    
+      process.env.MONGODB_USER
+    )}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${
+      process.env.MONGODB_URL
+    }/${process.env.MONGODB_DB}`;
+
     await mongoose.connect(uri);
     console.log("MongoDB connected!");
   } catch (error) {
