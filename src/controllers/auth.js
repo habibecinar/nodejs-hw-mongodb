@@ -1,7 +1,12 @@
 import UsersCollection from "../models/user.js";
 import createHttpError from "http-errors";
 import jwt from "jsonwebtoken";
-import { deleteSessionByUserId ,registerUser,loginUser,logoutUser,refreshSession } from "../services/auth.js";
+import { deleteSessionByUserId ,
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshSession
+} from "../services/auth.js";
 import { sendEmail } from "../services/emailService.js";
 import bcrypt from "bcrypt";
 
@@ -51,7 +56,9 @@ export const refreshSessionController = async (req, res, next) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(401).json({ status: 401, message: "Refresh token missing" });
+      return res.
+      status(401)
+      .json({ status: 401, message: "Refresh token missing" });
     }
 
     const session = await refreshSession(refreshToken);
@@ -94,34 +101,36 @@ export const logoutUserController = async (req, res, next) => {
 export const sendResetEmailController = async (req, res, next) => {
   try {
     const { email } = req.body;
-
     const user = await UsersCollection.findOne({ email });
     if (!user) {
       return res.status(404).json({ status: 404, message: "User not found!" });
     }
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
-
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET environment variable is missing!");
+      return res.status(500).json({ status: 500, message: "Server misconfiguration: JWT_SECRET missing" });
+    }
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
     // JWT token üret
     const token = jwt.sign(
-      { email: user.email },   // email koyuyoruz
+      { email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-
-    const resetLink = `${process.env.APP_DOMAIN}/auth/reset-pwd?token=${token}`;
-
-    await sendEmail({
-      to: email,
-      subject: "Password Reset",
-      html: `<p>Click the link to reset your password:</p>
-             <a href="${resetLink}">${resetLink}</a>`,
-    });
-
-    res.json({
+     const resetLink = `${process.env.APP_DOMAIN}/auth/reset-pwd?token=${token}`;
+       await sendEmail(
+      email,
+      "Password Reset",
+      `<p>Click the link to reset your password:</p>
+    <a href="${resetLink}">${resetLink}</a>`
+    );
+    // Sadece token'ı response olarak döndür
+    return res.json({
       status: 200,
-      message: "Password reset email sent",
+      message: "Token for test",
+      token
     });
   } catch (err) {
+    console.error("sendResetEmailController error:", err, "email:", req.body.email, "JWT_SECRET:", process.env.JWT_SECRET);
     next(err);
   }
 };

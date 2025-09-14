@@ -8,7 +8,13 @@ dotenv.config();
 const run = async () => {
   try {
     // MongoDB bağlantısı
-    const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/contacts_db";
+     const uri =
+      `mongodb+srv://${encodeURIComponent(
+        process.env.MONGO_USER
+      )}:${encodeURIComponent(process.env.MONGO_PASSWORD)}@${
+        process.env.MONGO_URL
+      }/${process.env.MONGO_DB}` || "mongodb://localhost:27017/contacts_db";
+      
     await mongoose.connect(uri);
     console.log("MongoDB connected ✅");
 
