@@ -6,7 +6,7 @@ export const createContactSchema = Joi.object({
   email: Joi.string().email().required(),
   isFavourite: Joi.boolean().default(false),
   contactType: Joi.string().valid("home", "work", "personal").default("personal"),
-  photo: Joi.string().uri().optional(), // Cloudinary URL'i için
+  photo: Joi.any().optional(), // File upload veya URL için
 });
 
 export const updateContactSchema = Joi.object({
@@ -15,5 +15,5 @@ export const updateContactSchema = Joi.object({
   email: Joi.string().email(),
   isFavourite: Joi.boolean(),
   contactType: Joi.string().valid("home", "work", "personal"),
-  photo: Joi.string().uri().optional(), // Cloudinary URL'i için
+  photo: Joi.any().optional(), // File upload veya URL için
 }).min(1); // en az 1 alan olmalı
