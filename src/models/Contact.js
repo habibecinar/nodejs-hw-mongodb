@@ -29,6 +29,10 @@ const contactSchema = new mongoose.Schema(
       default: "personal",
       required: true,
     },
+    photo: {
+      type: String,
+      default: null, // Cloudinary URL'ini saklayacak
+    },
     userId: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "users", // Hangi kullanıcıya ait olduğunu göstermek için

@@ -7,6 +7,7 @@ import {
   updateContactService,
   deleteContactService,
 } from "../services/contacts.js";
+import { uploadToCloudinary } from "../services/cloudinary.js";
 
 // GET /contacts  (pagination + sort + filter)
 export const getAllContactsController = async (req, res, next) => {
@@ -72,17 +73,20 @@ export const createContactController = async (req, res, next) => {
 
     let newContacts;
 
-    if (Array.isArray(req.body)) {
-      // Eğer body bir array ise → topluca ekle
+    // Multipart/form-data ile tek dosya upload
+    if (req.file || !Array.isArray(req.body)) {
+      // Tek contact ise → normal servis üzerinden ekle
+      const contactData = { ...req.body, userId };
+      
+      // Photo file varsa service'e gönder
+      newContacts = await createContactService(contactData, req.file);
+    } else if (Array.isArray(req.body)) {
+      // Bulk upload (array) - bu durumda photo upload desteklenmez
       const contactsData = req.body.map(contact => ({
         ...contact,
         userId,
       }));
       newContacts = await Contact.insertMany(contactsData);
-    } else {
-      // Tek contact ise → normal servis üzerinden ekle
-      const contactData = { ...req.body, userId };
-      newContacts = await createContactService(contactData);
     }
 
     res.status(201).json({
@@ -100,7 +104,9 @@ export const updateContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const userId = req.user.id; // sadece kendi kontaklarını güncelle
-    const updatedContact = await updateContactService(contactId, req.body, userId);
+    
+    // Photo file varsa service'e gönder
+    const updatedContact = await updateContactService(contactId, req.body, userId, req.file);
 
     if (!updatedContact) {
       return next(createError(404, "Contact not found"));

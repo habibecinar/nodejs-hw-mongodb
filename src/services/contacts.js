@@ -1,4 +1,5 @@
 import Contact from "../models/Contact.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "./cloudinary.js";
 
 // Tüm contactları (sayfalama + sıralama + filtreleme) getir
 export const getAllContactsService = async ({
@@ -45,19 +46,64 @@ export const getContactByIdService = async (contactId) => {
 };
 
 // Yeni contact oluştur
-export const createContactService = async (contactData) => {
+export const createContactService = async (contactData, photoFile = null) => {
+  // Eger foto dosyasi varsa Cloudinary'ye upload et
+  if (photoFile) {
+    try {
+      const photoUrl = await uploadToCloudinary(photoFile.path);
+      contactData.photo = photoUrl;
+    } catch (error) {
+      console.error("Photo upload failed:", error);
+      throw new Error("Failed to upload photo");
+    }
+  }
+
   const contact = new Contact(contactData);
   return await contact.save();
 };
 
 // Contact güncelle
-export const updateContactService = async (contactId, updatedData) => {
+export const updateContactService = async (contactId, updatedData, userId, photoFile = null) => {
+  // Mevcut contact'i al
+  const existingContact = await Contact.findOne({ _id: contactId, userId });
+  if (!existingContact) {
+    return null;
+  }
+
+  // Eger yeni foto dosyasi varsa
+  if (photoFile) {
+    try {
+      // Eski fotoyu sil (varsa)
+      if (existingContact.photo) {
+        await deleteFromCloudinary(existingContact.photo);
+      }
+      
+      // Yeni fotoyu upload et
+      const photoUrl = await uploadToCloudinary(photoFile.path);
+      updatedData.photo = photoUrl;
+    } catch (error) {
+      console.error("Photo upload failed:", error);
+      throw new Error("Failed to upload photo");
+    }
+  }
+
   return await Contact.findByIdAndUpdate(contactId, updatedData, {
     new: true,
   });
 };
 
 // Contact sil
-export const deleteContactService = async (contactId) => {
+export const deleteContactService = async (contactId, userId) => {
+  // Mevcut contact'i al
+  const existingContact = await Contact.findOne({ _id: contactId, userId });
+  if (!existingContact) {
+    return null;
+  }
+
+  // Eger foto varsa Cloudinary'den sil
+  if (existingContact.photo) {
+    await deleteFromCloudinary(existingContact.photo);
+  }
+
   return await Contact.findByIdAndDelete(contactId);
 };
