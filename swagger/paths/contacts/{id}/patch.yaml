@@ -1,0 +1,46 @@
+tags:
+  - Contacts
+summary: Update a contact by ID
+operationId: updateContactById
+security:
+  - bearerAuth: []
+description: |
+  Updates a contact by its unique ID. Accepts multipart/form-data for photo update.
+parameters:
+  - name: contactId
+    in: path
+    required: true
+    description: The unique identifier of the contact
+    schema:
+      type: string
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        $ref: '../../../components/schemas/ContactUpdate.yaml'
+responses:
+  '200':
+    description: Contact updated successfully.
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas/Contact.yaml'
+  '400':
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/responses/BadRequest.yaml'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/responses/Unauthorized.yaml'
+  '404':
+    description: Contact not found
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/responses/NotFound.yaml'

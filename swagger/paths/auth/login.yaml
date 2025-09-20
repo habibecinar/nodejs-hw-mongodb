@@ -1,0 +1,35 @@
+tags:
+  - Auth
+summary: Login a user
+operationId: loginUser
+description: |
+  Authenticates a user and returns an access token.
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '../../components/schemas/UserLogin.yaml'
+responses:
+  '200':
+    description: User logged in successfully.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  '400':
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/responses/BadRequest.yaml'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/responses/Unauthorized.yaml'

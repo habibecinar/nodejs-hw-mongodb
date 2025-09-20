@@ -1,0 +1,25 @@
+tags:
+  - Auth
+summary: Register a new user
+operationId: registerUser
+description: |
+  Registers a new user and returns the created user object.
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '../../components/schemas/UserRegister.yaml'
+responses:
+  '201':
+    description: User registered successfully.
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/User.yaml'
+  '400':
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/responses/BadRequest.yaml'

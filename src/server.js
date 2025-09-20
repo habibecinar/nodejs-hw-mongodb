@@ -7,6 +7,9 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import authRouter from "./routers/auth.js";
 import "./index.js";
 import cookieParser from "cookie-parser";
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
 export function setupServer() {
   const app = express();
   
@@ -14,6 +17,10 @@ export function setupServer() {
   app.get('/', (req, res) => {
     res.send({ message: 'Server is running!' });
   });
+  // Swagger UI
+  const swaggerPath = path.resolve('docs/openapi.yaml');
+  const swaggerDocument = YAML.load(swaggerPath);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   // Enable CORS
   app.use(cors());
 
